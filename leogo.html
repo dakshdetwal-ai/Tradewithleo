@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Daksh D – Trader & Developer</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    :root {
+      --bg: #050505;
+      --fg: #ffffff;
+      --soft: #999999;
+      --accent: #ffffff;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
+        "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top, #1b1b1b 0, #000 50%, #000 100%);
+      color: var(--fg);
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      letter-spacing: 0.02em;
+    }
+
+    /* High-motion animated background */
+
+    .bg-noise {
+      position: fixed;
+      inset: -50px;
+      background-image: 
+        repeating-linear-gradient(
+          120deg,
+          rgba(255, 255, 255, 0.04) 0,
+          rgba(255, 255, 255, 0.04) 1px,
+          transparent 1px,
+          transparent 3px
+        );
+      mix-blend-mode: screen;
+      opacity: 0.25;
+      pointer-events: none;
+      animation: moveNoise 6s linear infinite;
+    }
+
+    @keyframes moveNoise {
+      0% { transform: translate3d(0, 0, 0); }
+      100% { transform: translate3d(-80px, -80px, 0); }
+    }
+
+    .orb {
+      position: fixed;
+      width: 420px;
+      height: 420px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255, 255, 255, 0.04), transparent 65%);
+      filter: blur(1px);
+      mix-blend-mode: screen;
+      animation: floatOrb 10s ease-in-out infinite alternate;
+      pointer-events: none;
+    }
+    .orb:nth-child(1) { top: -80px; left: -40px; }
+    .orb:nth-child(2) { bottom: -120px; right: -80px; animation-delay: -2s; }
+
+    @keyframes floatOrb {
+      0% { transform: translate3d(0, 0, 0); }
+      100% { transform: translate3d(60px, -40px, 0) scale(1.05); }
+    }
+
+    /* Card container */
+
+    .frame {
+      position: relative;
+      width: min(900px, 94vw);
+      padding: 1px;
+      border-radius: 24px;
+      background: conic-gradient(
+        from 140deg,
+        rgba(255, 255, 255, 0.12),
+        rgba(255, 255, 255, 0.02),
+        rgba(255, 255, 255, 0.18),
+        rgba(255, 255, 255, 0.04),
+        rgba(255, 255, 255, 0.16)
+      );
+      overflow: hidden;
+      box-shadow: 0 30px 80px rgba(0, 0, 0, 0.9);
+      animation: frameGlow 3.5s ease-in-out infinite alternate;
+      transform-style: preserve-3d;
+    }
+
+    @keyframes frameGlow {
+      0% {
+        box-shadow: 0 24px 60px rgba(0, 0, 0, 0.9),
+          0 0 16px rgba(255, 255, 255, 0.08);
+      }
+      100% {
+        box-shadow: 0 42px 110px rgba(0, 0, 0, 1),
+          0 0 34px rgba(255, 255, 255, 0.16);
+      }
+    }
+
+    .card {
+      position: relative;
+      border-radius: 23px;
+      background: radial-gradient(circle at top left, #121212, #030303 60%);
+      padding: 28px 28px 26px;
+      display: grid;
+      grid-template-columns: minmax(0, 3.2fr) minmax(0, 2.4fr);
+      gap: 20px;
+      overflow: hidden;
+      transform: translate3d(0, 0, 0);
+      animation: cardEnter 0.9s cubic-bezier(0.2, 0.9, 0.2, 1.2) forwards,
+                 cardFloat 7s ease-in-out infinite alternate;
+    }
+
+    @keyframes cardEnter {
+      from {
+        opacity: 0;
+        transform: translate3d(0, 26px, 0) scale(0.96);
+      }
+      to {
+        opacity: 1;
+        transform: translate3d(0, 0, 0) scale(1);
+      }
+    }
+
+    @keyframes cardFloat {
+      0% { transform: translate3d(0, 0, 0); }
+      100% { transform: translate3d(0, -8px, 0); }
+    }
+
+    .scan-line {
+      position: absolute;
+      height: 1px;
+      left: 0;
+      right: 0;
+      top: -10%;
+      background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.8),
+        transparent
+      );
+      opacity: 0.2;
+      animation: scan 3.2s linear infinite;
+      pointer-events: none;
+    }
+
+    @keyframes scan {
+      0% { transform: translateY(0); }
+      100% { transform: translateY(120%); }
+    }
+
+    /* Left: identity */
+
+    .identity {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 18px;
+      z-index: 1;
+    }
+
+    .top-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .avatar-wrap {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .avatar {
+      width: 84px;
+      height: 84px;
+      border-radius: 999px;
+      border: 2px solid rgba(255, 255, 255, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 38px;
+      font-weight: 700;
+      text-transform: uppercase;
+      background:
+        radial-gradient(circle at 30% 0%, #ffffff 0, #ffffff 4px, transparent 40%),
+        radial-gradient(circle at 70% 120%, #ffffff 0, #ffffff 6px, transparent 55%),
+        #000;
+      filter: grayscale(1);
+      overflow: hidden;
+      position: relative;
+      box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.3),
+        0 12px 22px rgba(0, 0, 0, 0.9);
+      animation: avatarPulse 2.6s ease-in-out infinite;
+    }
+
+    /* To use your real face, replace background with an <img>:
+       .avatar { background:none; }
+       .avatar img { width:100%; height:100%; object-fit:cover; filter:grayscale(1); } */
+
+    @keyframes avatarPulse {
+      0% { transform: translateY(0) scale(1); }
+      100% { transform: translateY(-3px) scale(1.03); }
+    }
+
+    .avatar-ring {
+      position: absolute;
+      inset: -4px;
+      border-radius: inherit;
+      border: 1px dashed rgba(255, 255, 255, 0.3);
+      animation: spin 16s linear infinite;
+      pointer-events: none;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .name-block {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .name {
+      font-size: clamp(1.6rem, 3vw, 2rem);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+    }
+
+    .tagline {
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      color: var(--soft);
+      letter-spacing: 0.24em;
+    }
+
+    .right-tag {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.22em;
+      color: var(--soft);
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.28);
+      padding: 6px 14px;
+      backdrop-filter: blur(10px);
+      background: rgba(0, 0, 0, 0.5);
+      white-space: nowrap;
+    }
+
+    .headline {
+      margin-top: 14px;
+      font-size: 1.05rem;
+      color: #f5f5f5;
+    }
+
+    .bio {
+      margin-top: 6px;
+      font-size: 0.9rem;
+      color: var(--soft);
+      max-width: 30rem;
+      line-height: 1.5;
+    }
+
+    .roles {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    .pill {
+      font-size: 0.78rem;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.26);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #e5e5e5;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .pill::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        120deg,
+        transparent,
+        rgba(255, 255, 255, 0.28),
+        transparent
+      );
+      opacity: 0;
+      transform: translateX(-100%);
+      transition: opacity 0.25s ease, transform 0.35s ease;
+    }
+
+    .pill:hover::before {
+      opacity: 1;
+      transform: translateX(100%);
+    }
+
+    .location {
+      margin-top: 18px;
+      font-size: 0.8rem;
+      color: var(--soft);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .location-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+      animation: pulseDot 1.8s ease-in-out infinite;
+    }
+
+    @keyframes pulseDot {
+      0% { transform: scale(0.9); opacity: 0.4; }
+      100% { transform: scale(1.3); opacity: 1; }
+    }
+
+    .contact {
+      margin-top: 18px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      font-size: 0.8rem;
+    }
+
+    .chip {
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      padding: 7px 12px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(12px);
+      cursor: pointer;
+      text-decoration: none;
+      color: inherit;
+      transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    }
+
+    .chip:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 20px rgba(0, 0, 0, 0.9);
+      border-color: rgba(255, 255, 255, 0.8);
+    }
+
+    .chip-label {
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      font-size: 0.7rem;
+      color: var(--soft);
+    }
+
+    .chip-value {
+      font-size: 0.78rem;
+      white-space: nowrap;
+    }
+
+    /* Right: stats + vertical text */
+
+    .side {
+      position: relative;
+      border-left: 1px solid rgba(255, 255, 255, 0.12);
+      padding-left: 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 12px;
+      overflow: hidden;
+    }
+
+    .side-top {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .label {
+      font-size: 0.7rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--soft);
+    }
+
+    .stat-row {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .stat-main {
+      font-size: 0.95rem;
+    }
+
+    .stat-sub {
+      font-size: 0.78rem;
+      color: var(--soft);
+    }
+
+    .divider {
+      width: 100%;
+      height: 1px;
+      background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.35),
+        transparent
+      );
+      margin: 8px 0;
+      opacity: 0.7;
+    }
+
+    .ticker {
+      margin-top: 4px;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: #f5f5f5;
+    }
+
+    .ticker span {
+      background: #000;
+      padding: 4px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .vertical-text {
+      position: absolute;
+      right: -40px;
+      top: 16px;
+      font-size: 0.7rem;
+      letter-spacing: 0.26em;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, 0.16);
+      transform: rotate(90deg);
+    }
+
+    .footer-line {
+      margin-top: 16px;
+      font-size: 0.7rem;
+      color: var(--soft);
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+    }
+
+    /* Mobile */
+
+    @media (max-width: 720px) {
+      body {
+        padding: 14px;
+        overflow-y: auto;
+      }
+
+      .card {
+        grid-template-columns: 1fr;
+        padding: 20px 18px 18px;
+        animation: cardEnter 0.7s ease-out forwards, cardFloat 7s ease-in-out infinite alternate;
+      }
+
+      .side {
+        border-left: none;
+        border-top: 1px solid rgba(255, 255, 255, 0.12);
+        padding-left: 0;
+        padding-top: 16px;
+      }
+
+      .avatar {
+        width: 72px;
+        height: 72px;
+        font-size: 32px;
+      }
+
+      .vertical-text {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-noise"></div>
+  <div class="orb"></div>
+  <div class="orb"></div>
+
+  <div class="frame" id="card-frame">
+    <div class="card" id="card">
+      <div class="scan-line"></div>
+
+      <!-- LEFT: Identity -->
+      <section class="identity">
+        <div>
+          <div class="top-row">
+            <div class="avatar-wrap">
+              <div class="avatar">
+                <!-- Replace 'D' + background with your face image if you want -->
+                D
+                <div class="avatar-ring"></div>
+              </div>
+              <div class="name-block">
+                <div class="name">Daksh D</div>
+                <div class="tagline">Trader & Microsoft Certified Developer</div>
+              </div>
+            </div>
+            <div class="right-tag">
+              Personal card • high motion
+            </div>
+          </div>
+
+          <div class="headline">
+            Hey, I’m Daksh — a software developer obsessed with markets.
+          </div>
+          <div class="bio">
+            I’m a Microsoft certified software developer who is passionate about trading. I write code, design
+            clean experiences, and push risk-managed trades with intent.
+          </div>
+
+          <div class="roles">
+            <div class="pill">Trader</div>
+            <div class="pill">Software Developer</div>
+            <div class="pill">Engineer</div>
+            <div class="pill">Website Designer</div>
+            <div class="pill">UI · UX Designer</div>
+          </div>
+
+          <div class="location">
+            <span class="location-dot"></span>
+            Jaipur · Rajasthan · India
+          </div>
+
+          <div class="contact">
+            <a class="chip" href="mailto:collabxdaksh@gmail.com">
+              <span class="chip-label">Email</span>
+              <span class="chip-value">collabxdaksh@gmail.com</span>
+            </a>
+            <a class="chip" href="https://instagram.com/dakshdetwal" target="_blank" rel="noopener noreferrer">
+              <span class="chip-label">Instagram</span>
+              <span class="chip-value">@dakshdetwal</span>
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <!-- RIGHT: Stats / signal -->
+      <aside class="side">
+        <div class="side-top">
+          <div class="label">Profile signal</div>
+
+          <div class="stat-row">
+            <div class="stat-main">Trading × Software × Design</div>
+            <div class="stat-sub">
+              Building and shipping projects while tracking price action and flows.
+            </div>
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="stat-row">
+            <div class="stat-main">Focused on growth, collaboration and execution.</div>
+            <div class="stat-sub">
+              Open to serious collabs, products and systems that move numbers.
+            </div>
+          </div>
+
+          <div class="ticker">
+            <span>Now scanning: new opportunities · new ideas · new capital</span>
+          </div>
+        </div>
+
+        <div>
+          <div class="footer-line">
+            Swipe • scroll • screenshot · this is Daksh in black & white.
+          </div>
+        </div>
+
+        <div class="vertical-text">
+          Daksh&nbsp;D · trader · developer · designer
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <script>
+    // High-motion but smooth parallax
+    const frame = document.getElementById("card-frame");
+    const card = document.getElementById("card");
+
+    window.addEventListener("mousemove", (e) => {
+      const x = (e.clientX / window.innerWidth - 0.5) * 2;
+      const y = (e.clientY / window.innerHeight - 0.5) * 2;
+
+      const rotateX = y * -6;
+      const rotateY = x * 8;
+
+      frame.style.transform =
+        `perspective(1200px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+      card.style.transform =
+        `translate3d(${x * 6}px, ${y * 6 - 4}px, 0)`;
+    });
+
+    window.addEventListener("mouseleave", () => {
+      frame.style.transform = "perspective(1200px) rotateX(0deg) rotateY(0deg)";
+      card.style.transform = "translate3d(0, -4px, 0)";
+    });
+  </script>
+</body>
+</html>
